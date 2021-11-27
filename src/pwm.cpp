@@ -20,6 +20,11 @@ PWM::PWM() {
 
 bool PWM::is_ready() const {
     bool ret = true;
+
+    for (int i=0; i<4; i++) {
+        ret &= device_is_ready(_pwm_devs[i]);
+    }
+
     return ret;
 }
 
@@ -30,7 +35,7 @@ void PWM::write(const float (&outputs)[4]) {
 
     for (int i=0; i<4; i++) {
         uint32_t pulse = _min_duty + static_cast<uint32_t>( (_max_duty - _min_duty) * outputs[i]);
-        int ret = pwm_pin_set_usec(_pwm_devs[i], 1, _period, pulse, 0);
+        int ret = pwm_pin_set_usec(_pwm_devs[i], _pwm_channels[i], _period, pulse, 0);
 
         if (ret < 0) {
             printk("EROORORORO %d\n", ret);

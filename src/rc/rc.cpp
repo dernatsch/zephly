@@ -176,15 +176,28 @@ int rc_update(uint32_t dt) {
     return ret;
 }
 
-struct RCInput rc_get() {
+inline float rc2float(uint16_t rc) {
+	
+	float tmp = (rc - 0x8000) / 43700.0f + 0.5f;
+
+	if (tmp>1.0f) {
+		return 1.0f;
+	} else if (tmp <0.0f) {
+		return 0.0f;
+	} else {
+		return tmp;
+	}
+}
+
+Command rc_get() {
     
     uart_irq_rx_disable(usart_rc);
 
-    struct RCInput input = {
-        srxlChData.values[1],
-        srxlChData.values[2],
-        srxlChData.values[0],
-        srxlChData.values[3],
+    Command input = {
+        rc2float(srxlChData.values[1]),
+        rc2float(srxlChData.values[2]),
+        rc2float(srxlChData.values[0]),
+        rc2float(srxlChData.values[3]),
     };
 
     uart_irq_rx_enable(usart_rc);

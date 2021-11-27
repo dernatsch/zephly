@@ -16,7 +16,7 @@ else ()
     add_subdirectory(lib)
 
     if(BUILD_EXPERIMENT)
-        target_sources(app PRIVATE src/main_experiment.cpp)
+        target_sources(app PRIVATE src/main_experiment_pwm.cpp)
     else ()
         target_sources(app PRIVATE 
             src/main.cpp
@@ -28,7 +28,7 @@ else ()
         )
     endif()
 
-    target_link_libraries(app PRIVATE attitude_estimation msgs)
+    target_link_libraries(app PRIVATE attitude_estimation msgs mixer)
 
     # disable exceptions
     # to mitigate problems with static variable initialization guards

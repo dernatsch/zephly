@@ -1,14 +1,8 @@
 #ifndef RC_HPP
 #define RC_HPP
 
+#include <msgs.hpp>
 #include <stdint.h>
-
-struct RCInput {
-    uint16_t roll;
-    uint16_t pitch;
-    uint16_t throttle;
-    uint16_t yaw;
-};
 
 /**
  * @brief Call during initialization of system
@@ -39,6 +33,6 @@ void rc_run();
  * 
  * @return struct RCInput 
  */
-struct RCInput rc_get();
+Command rc_get();
 
 #endif // RC_HPP

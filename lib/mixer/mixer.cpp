@@ -9,7 +9,7 @@ static float B_inv[4][4] = {
 
 void simple_mix(Command cmd, float (&outputs)[4]) {
 
-    float inputs[4] = {cmd.roll, cmd.pitch, cmd.yaw, cmd.thrust};
+    float inputs[4] = {cmd.roll, cmd.pitch, cmd.yaw, cmd.throttle};
 
     for (int i=0; i<4; i++) {
         // reset outputs
