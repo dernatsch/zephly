@@ -45,7 +45,12 @@ int main() {
 		rc_input = rc_get();
 		rc_print(rc_input);
 
-		cmd2outputs(rc_input, outputs);
+		//cmd2outputs(rc_input, outputs);
+
+		outputs[0] += 0.1;
+		if (outputs[0] >= 1.0) {
+			outputs[0] = 0.0;
+		}
 
 		pwm.write(outputs);
 		printf("o:\t%f\t%f\t%f\t%f\n", outputs[0], outputs[1], outputs[2], outputs[3]);

@@ -27,6 +27,6 @@ private:
     PWM();
 
     const struct device* _pwm_devs[4];
-    uint8_t _pwm_num_of_pins[4];
+    uint8_t _pwm_channels[4];
 
 };

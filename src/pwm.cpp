@@ -1,47 +1,25 @@
-#include "pwm.hpp"
 #include <zephyr.h>
 #include <drivers/pwm.h>
 #include <devicetree.h>
+#include "pwm.hpp"
 
-#define NODE_OKAY(node) DT_NODE_HAS_STATUS(DT_NODELABEL(node), okay)
-#define GET_PWM(node) DEVICE_DT_GET(DT_NODELABEL(node))
-#define GET_PWM_NUM_PINS(node) 0
+// TODO FIX, just hack..
+#define PWM_ARRAY DT_N_S_pwm_array_0
 
 PWM::PWM() {
-#if NODE_OKAY(pwm1)
-    _pwm_devs[0] = GET_PWM(pwm1);
-    _pwm_num_of_pins[0] = 4; //GET_PWM_NUM_PINS(pwm1);
-#endif
-#if NODE_OKAY(pwm2)
-    _pwm_devs[1] = GET_PWM(pwm2);
-    _pwm_num_of_pins[1] = GET_PWM_NUM_PINS(pwm2);
-#endif
-#if NODE_OKAY(pwm3)
-    _pwm_devs[2] = GET_PWM(pwm3);
-    _pwm_num_of_pins[2] = GET_PWM_NUM_PINS(pwm3);
-#endif
-#if NODE_OKAY(pwm4)
-    _pwm_devs[3] = GET_PWM(pwm4);
-    _pwm_num_of_pins[3] = GET_PWM_NUM_PINS(pwm4);
-#endif
+    _pwm_devs[0] = DEVICE_DT_GET(DT_PWMS_CTLR_BY_IDX(PWM_ARRAY, 0));
+    _pwm_devs[1] = DEVICE_DT_GET(DT_PWMS_CTLR_BY_IDX(PWM_ARRAY, 1));
+    _pwm_devs[2] = DEVICE_DT_GET(DT_PWMS_CTLR_BY_IDX(PWM_ARRAY, 2));
+    _pwm_devs[3] = DEVICE_DT_GET(DT_PWMS_CTLR_BY_IDX(PWM_ARRAY, 3));
+
+    _pwm_channels[0] = DT_PWMS_CELL_BY_IDX(PWM_ARRAY, 0, channel);
+    _pwm_channels[1] = DT_PWMS_CELL_BY_IDX(PWM_ARRAY, 1, channel);
+    _pwm_channels[2] = DT_PWMS_CELL_BY_IDX(PWM_ARRAY, 2, channel);
+    _pwm_channels[3] = DT_PWMS_CELL_BY_IDX(PWM_ARRAY, 3, channel);
 };
 
 bool PWM::is_ready() const {
     bool ret = true;
-
-#if NODE_OKAY(pwm1)
-    ret &= device_is_ready(_pwm_devs[0]);
-#endif
-#if NODE_OKAY(pwm2)
-    ret &= device_is_ready(_pwm_devs[1]);
-#endif
-#if NODE_OKAY(pwm3)
-    ret &= device_is_ready(_pwm_devs[2]);
-#endif
-#if NODE_OKAY(pwm4)
-    ret &= device_is_ready(_pwm_devs[3]);
-#endif
-
     return ret;
 }
 
@@ -50,22 +28,14 @@ void PWM::write(const float (&outputs)[4]) {
         return;
     }
 
-    int dev_idx = 0;
-    int last_dev_swap_idx = 0;
-
     for (int i=0; i<4; i++) {
+        uint32_t pulse = _min_duty + static_cast<uint32_t>( (_max_duty - _min_duty) * outputs[i]);
+        int ret = pwm_pin_set_usec(_pwm_devs[i], 1, _period, pulse, 0);
 
-        if (_pwm_devs[dev_idx] == NULL || (i - last_dev_swap_idx) >= _pwm_num_of_pins[dev_idx]) {
-            dev_idx++;
-        }
-
-        if (dev_idx >= 4) {
+        if (ret < 0) {
+            printk("EROORORORO %d\n", ret);
             break;
         }
-
-        uint32_t pulse = _min_duty + static_cast<uint32_t>( (_max_duty - _min_duty) * outputs[i]);
-        int pin_num = i+1 - last_dev_swap_idx;
-        pwm_pin_set_usec(_pwm_devs[dev_idx], pin_num, _period, pulse, 0);
     }
 
 #ifdef CONFIG_BOARD_STM32F3_DISCO

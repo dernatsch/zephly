@@ -1,0 +1,9 @@
+Device STM32F103CB
+speed 4000
+IF SWD
+Connect
+erase
+loadbin build_cc3d/zephyr/zephyr.bin 0x00
+r
+g
+quit

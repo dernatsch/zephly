@@ -31,6 +31,14 @@
 		userled0 = &led0;
 		rc-uart = &usart1;
 	};
+
+	pwm_array_0 {
+		compatible = "pwm-array";
+		pwms = <&pwm1 4 0 PWM_POLARITY_NORMAL>,
+			   <&pwm1 3 0 PWM_POLARITY_NORMAL>,
+			   <&pwm1 2 0 PWM_POLARITY_NORMAL>,
+			   <&pwm2 1 0 PWM_POLARITY_NORMAL>;
+	};
 };
 
 &clk_hse {
